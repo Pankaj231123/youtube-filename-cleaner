@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Filename Cleaner",
+  "version": "1.0.0",
+  "description": "Clean video filenames before YouTube upload",
+  "permissions": ["storage"],
+  "host_permissions": ["http://localhost:4000/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Filename Cleaner"
+  }
+}
