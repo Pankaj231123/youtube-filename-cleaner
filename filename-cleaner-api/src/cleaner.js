@@ -9,36 +9,34 @@ function splitExtension(filename) {
   if (lastDot === -1) return { name: filename, ext: "" };
   return {
     name: filename.slice(0, lastDot),
-    ext: filename.slice(lastDot) 
+    ext: filename.slice(lastDot)
   };
 }
 
-function toSnakeCase(str) {
+function normalizeToWords(str) {
   return str
     .replace(/[^a-zA-Z0-9]+/g, " ")
     .trim()
     .split(/\s+/)
-    .join("_")
-    .toLowerCase();
+    .filter(Boolean);
+}
+function toSnakeCase(str) {
+  return normalizeToWords(str).join("_").toLowerCase();
 }
 
 function toCamelCase(str) {
-  const words = str
-    .replace(/[^a-zA-Z0-9]+/g, " ")
-    .trim()
-    .split(/\s+/);
+  const words = normalizeToWords(str);
   return words
     .map((w, i) =>
-      i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+      i === 0
+        ? w.toLowerCase()
+        : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
     )
     .join("");
 }
 
 function toTitleCase(str) {
-  return str
-    .replace(/[^a-zA-Z0-9]+/g, " ")
-    .trim()
-    .split(/\s+/)
+  return normalizeToWords(str)
     .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join("");
 }
@@ -57,14 +55,17 @@ function cleanBaseName(rawName, removeWords = DEFAULT_REMOVE_WORDS) {
   s = s.replace(/_+/g, " ");
   s = s.replace(/\s+/g, " ").trim();
 
-  // remove junk words
+  // remove junk words (case-insensitive)
   const removeSet = new Set(removeWords.map(w => w.toLowerCase()));
   const words = s.split(" ").filter(w => !removeSet.has(w.toLowerCase()));
 
   // de-duplicate adjacent words
   const deduped = [];
   for (const w of words) {
-    if (deduped.length === 0 || deduped[deduped.length - 1].toLowerCase() !== w.toLowerCase()) {
+    if (
+      deduped.length === 0 ||
+      deduped[deduped.length - 1].toLowerCase() !== w.toLowerCase()
+    ) {
       deduped.push(w);
     }
   }
@@ -73,11 +74,18 @@ function cleanBaseName(rawName, removeWords = DEFAULT_REMOVE_WORDS) {
 }
 
 function applyTemplate(template, { niche, title, episode, date }) {
-  return template
-    .replaceAll("{niche}", niche || "")
-    .replaceAll("{title}", title || "")
-    .replaceAll("{episode}", episode != null ? String(episode) : "")
-    .replaceAll("{date}", date || "");
+  // Use replaceAll when available; fallback keeps same effect
+  const replaceAllSafe = (str, find, repl) =>
+    typeof str.replaceAll === "function"
+      ? str.replaceAll(find, repl)
+      : str.split(find).join(repl);
+
+  let out = template;
+  out = replaceAllSafe(out, "{niche}", niche || "");
+  out = replaceAllSafe(out, "{title}", title || "");
+  out = replaceAllSafe(out, "{episode}", episode != null ? String(episode) : "");
+  out = replaceAllSafe(out, "{date}", date || "");
+  return out;
 }
 
 function formatCase(str, caseStyle) {
@@ -113,7 +121,6 @@ function buildCleanFilename({
   });
 
   const finalBase = cleanBaseName(templated, removeWords);
-
   const cased = formatCase(finalBase, caseStyle);
 
   return cased + ext;
