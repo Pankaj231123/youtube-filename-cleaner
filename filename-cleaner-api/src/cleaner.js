@@ -1,6 +1,6 @@
 const DEFAULT_REMOVE_WORDS = [
   "final", "copy", "new", "v1", "v2", "v3", "v4",
-  "edited", "export", "render", "draft", "version"
+  "edited", "export", "render", "draft", "version", "()"
 ];
 
 // keep extension safe
@@ -9,7 +9,7 @@ function splitExtension(filename) {
   if (lastDot === -1) return { name: filename, ext: "" };
   return {
     name: filename.slice(0, lastDot),
-    ext: filename.slice(lastDot) // includes dot
+    ext: filename.slice(lastDot) 
   };
 }
 
