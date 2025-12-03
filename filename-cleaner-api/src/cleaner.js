@@ -1,6 +1,10 @@
 const DEFAULT_REMOVE_WORDS = [
   "final", "copy", "new", "v1", "v2", "v3", "v4",
-  "edited", "export", "render", "draft", "version", "()"
+  "edited", "export", "render", "draft", "version", "()",
+  "temp", "tmp", "test", "old", "backup", "bak", "archive", "archived",
+  "rev", "revision", "revised", "update", "updated", "latest",
+  "duplicate", "dup", "untitled",
+  "exported", "rendered", "output", "compressed", "download", "downloads"
 ];
 
 // keep extension safe
